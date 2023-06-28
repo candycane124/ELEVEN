@@ -174,7 +174,7 @@ class gameContainer():
         score = 0
         for row in self.grid:
             for cell in row:
-                if cell.val == 12:
+                if cell.val == 11:
                     return True
                 score += cell.val*cell.val
         self.score = score
@@ -188,60 +188,121 @@ grid.new(1)
 images = []
 for i in range(12):
     images.append(pygame.image.load(f"assets/{i}.png"))
+win = False
+
+backBtn = pygame.image.load("assets/back.png")
+exitBtn = pygame.image.load("assets/exit.png")
+continueBtn = pygame.image.load("assets/continue.png")
+replayBtn = pygame.image.load("assets/replay.png")
+
 running = True
 validKey = False
 nextUp = 1
+scene = 1
 while running:
     SCREEN.fill((0,0,0))
+    if scene == 1: #GAME
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                scene = 2
+            if event.type == pygame.KEYDOWN:
+                validKey = True
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    if not grid.right():
+                        validKey = False
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    if not grid.left():
+                        validKey = False
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    if not grid.down():
+                        validKey = False
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                    if not grid.up():
+                        validKey = False
+                else:
+                    validKey = False
 
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            print("YOU QUIT")
-            print(grid.score)
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            validKey = True
-            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                if not grid.right():
-                    validKey = False
-            elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                if not grid.left():
-                    validKey = False
-            elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                if not grid.down():
-                    validKey = False
-            elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                if not grid.up():
-                    validKey = False
+        pygame.draw.rect(SCREEN,(150,150,150),(75,25,450,450))
+        grid.display(SCREEN,images)
+        genText(SCREEN,"Next Block: ",(240,240,240),20,(245,545),"top-right")
+        SCREEN.blit(images[nextUp],(250,500))
+        genText(SCREEN,"Score: "+str(grid.score),(240,240,240),10,(50,600),"bottom-left")
+
+        pygame.display.update()
+
+        if validKey:
+            if grid.updateScore() and not win:
+                win = True
+                scene = 3
+            if grid.new(nextUp) == False:
+                scene = 4
+            if grid.score >= 100:
+                nextUp = random.choices([1,2,3],weights=(60,60,20),k=3)[0]
             else:
-                validKey = False
+                nextUp = random.randint(1,2)
+            validKey = False
+    elif scene == 2: #LEAVE CONFIRM
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+            if event.type == MOUSEBUTTONDOWN:
+                mousePos = pygame.mouse.get_pos()
+                if mousePos[1] >= 230 and mousePos[1] <= 320:
+                    if mousePos[0] >= 120 and mousePos[0] <= 290:
+                        scene = 1
+                    elif mousePos[0] >= 310 and mousePos[0] <= 480:
+                        running = False
+        genText(SCREEN,"Your game will not save, are you sure you want to leave?",(250,250,250),14,(300,120),"middle")
+        SCREEN.blit(backBtn,(120,230))
+        SCREEN.blit(exitBtn,(310,230))
+        pygame.display.update()
+    elif scene == 3: #WINNER
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                scene = 2
+            if event.type == MOUSEBUTTONDOWN:
+                mousePos = pygame.mouse.get_pos()
+                if mousePos[1] >= 230 and mousePos[1] <= 320:
+                    if mousePos[0] >= 120 and mousePos[0] <= 290:
+                        scene = 1
+                    elif mousePos[0] >= 310 and mousePos[0] <= 480:
+                        grid = gameContainer()
+                        grid.new(1)
+                        images = []
+                        for i in range(12):
+                            images.append(pygame.image.load(f"assets/{i}.png"))
+                        scene = 1
+                        win = False
+        genText(SCREEN,"Eleven! Congrats, you won!",(250,250,250),14,(300,120),"middle")
+        SCREEN.blit(continueBtn,(120,230))
+        SCREEN.blit(replayBtn,(310,230))
+        pygame.display.update()
+    elif scene == 4: #LOSER
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                scene = 2
+            if event.type == MOUSEBUTTONDOWN:
+                mousePos = pygame.mouse.get_pos()
+                if mousePos[1] >= 230 and mousePos[1] <= 320:
+                    if mousePos[0] >= 120 and mousePos[0] <= 290:
+                        grid = gameContainer()
+                        grid.new(1)
+                        images = []
+                        for i in range(12):
+                            images.append(pygame.image.load(f"assets/{i}.png"))
+                        scene = 1
+                        win = False
+                    elif mousePos[0] >= 310 and mousePos[0] <= 480:
+                        running = False
+        genText(SCREEN,"You LOST!",(250,250,250),14,(300,120),"middle")
+        SCREEN.blit(replayBtn,(120,230))
+        SCREEN.blit(exitBtn,(310,230))  
+        pygame.display.update()
 
-    pygame.draw.rect(SCREEN,(150,150,150),(75,25,450,450))
-    grid.display(SCREEN,images)
-    genText(SCREEN,"Next Block: ",(240,240,240),20,(245,545),"top-right")
-    SCREEN.blit(images[nextUp],(250,500))
-    genText(SCREEN,"Score: "+str(grid.score),(240,240,240),10,(50,600),"bottom-left")
-
-    pygame.display.update()
-
-    if validKey:
-        if grid.updateScore():
-            win = True
-        if grid.new(nextUp) == False:
-            print("YOU LOSE")
-            print(grid.score)
-            pygame.quit()
-            sys.exit()
-        if grid.score >= 100:
-            nextUp = random.choices([1,2,3],weights=(60,60,20),k=3)[0]
-        else:
-            nextUp = random.randint(1,2)
-        validKey = False
-
-if win:
-    print("YOU WIN!!")
-    print(grid.score)
+print(grid.score)
 
 with open("scores.txt","a") as outFile:
     outFile.write(str(grid.score)+"\n")
+
+pygame.quit()
+sys.exit()
