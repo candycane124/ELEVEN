@@ -1,8 +1,6 @@
 import pygame
 
 def genText(screen, text, colour, size, pos, align, font="freesansbold.ttf"):
-    '''
-    '''
     font = pygame.font.Font(font, size)
     rendered = font.render(text, True, colour)
     rendRect = rendered.get_rect()
