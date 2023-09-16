@@ -1,13 +1,15 @@
 # ELEVEN!
-2048-esque game
+
+Single-player puzzle game, 2048 clone -- built with Python (Pygame) for entertainment & educational purposes.
 
 ## Overview
 
-Use *W*, *A*, *S*, & *D* or the *arrow keys* to move the blocks. <br>
-Blocks with the same number will combine to form the next number. Keep going until you get 11!
+- Use `W`, `A`, `S`, & `D` or the `arrow keys` to move the blocks
+- Blocks with the same number will combine to form the following number.
+- Keep going until you get **11**!
 
-## Program Info
+## Info
 
-Author: Angela H
 Created: 06.06.23
-Updated: 06.28.23
+
+Code Last Updated: 06.28.23
